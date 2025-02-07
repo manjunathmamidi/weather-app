@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather API Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #weatherInfo {
+            margin-top: 20px;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Weather Information</h1>
+
+    <!-- Input to enter the city name -->
+    <label for="city">Enter City Name:</label>
+    <input type="text" id="city" placeholder="Enter city name">
+    <button onclick="getWeather()">Get Weather</button>
+
+    <!-- Weather data will be displayed here -->
+    <div id="weatherInfo"></div>
+
+    <script>
+        // OpenWeather API URL (Replace 'YOUR_API_KEY' with your actual key)
+        const apiKey = 'c9fd9efc55dc0727c124df330ac3057b'; // Your actual OpenWeather API Key
+        const apiUrl = 'https://api.openweathermap.org/data/2.5/weather';
+
+        // Function to fetch weather data
+        function getWeather() {
+            const city = document.getElementById('city').value.trim();
+            if (city === '') {
+                alert('Please enter a city name.');
+                return;
+            }
+
+            // Construct the API request URL
+            const url = `${apiUrl}?q=${city}&appid=${apiKey}&units=metric`; // 'metric' for Celsius
+
+            // Fetch weather data from OpenWeather
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('City not found or invalid API key');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Get the weather data
+                    const temp = data.main.temp;
+                    const description = data.weather[0].description;
+                    const humidity = data.main.humidity;
+                    const windSpeed = data.wind.speed;
+                    const icon = data.weather[0].icon;
+
+                    // Display the weather data on the page
+                    const weatherInfo = `
+                        <h2>Weather in ${city}</h2>
+                        <p><strong>Temperature:</strong> ${temp}°C</p>
+                        <p><strong>Description:</strong> ${description}</p>
+                        <p><strong>Humidity:</strong> ${humidity}%</p>
+                        <p><strong>Wind Speed:</strong> ${windSpeed} m/s</p>
+                        <img src="http://openweathermap.org/img/wn/${icon}.png" alt="Weather icon">
+                    `;
+                    document.getElementById('weatherInfo').innerHTML = weatherInfo;
+                })
+                .catch(error => {
+                    document.getElementById('weatherInfo').innerHTML = `<p class="error">Error: ${error.message}</p>`;
+                });
+        }
+    </script>
+</body>
+</html>
